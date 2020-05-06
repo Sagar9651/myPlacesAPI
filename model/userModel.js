@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-var userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     name: { type: String },
     emailId: { type: String, required: true },
     password: { type: String, required: true },
@@ -15,10 +15,9 @@ var userSchema = mongoose.Schema({
     timestamps: true
 });
 
-userSchema.set('toJSON', {
-    virtuals: true,
-    versionKey: false
-});
+    userSchema.set('toJSON', {
+        virtuals: true,
+        versionKey: false
+    });
 
-var userModel = mongoose.model('User', userSchema);
-module.exports = userModel;
+module.exports = mongoose.model('User', userSchema);

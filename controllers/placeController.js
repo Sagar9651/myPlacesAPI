@@ -3,13 +3,20 @@ const router = express.Router();
 const placeModel = require('../model/placesModel');
 
 
-router.post('/savePlace', savePlace)
-router.get('/getPlaces/:userId', getPlaces)
-router.put('/updatePlace/:placeId', updatePlace)
-router.delete('/deletePlace/:placeId', deletePlace)
+// router.post('/savePlace', savePlace)
+// router.get('/getPlaces/:userId', getPlaces)
+// router.put('/updatePlace/:placeId', updatePlace)
+// router.delete('/deletePlace/:placeId', deletePlace)
 
-module.exports = router;
+// module.exports = router;
 
+
+module.exports = {
+    savePlace,
+    getPlaces,
+    updatePlace,
+    deletePlace
+}
 
 async function getPlaces(req, res) {
     await placeModel.find({ userId: req.params.userId }, function (err, places) {

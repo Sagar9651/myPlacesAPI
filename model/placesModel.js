@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-var placeSchema = mongoose.Schema({
+const placeSchema = mongoose.Schema({
     address: {type: String},
     name:{type: String},
     longitude:{type: Number},
@@ -16,5 +16,4 @@ placeSchema.set('toJSON',{
     versionKey: false
 });
 
- var userModel =  mongoose.model('places',placeSchema);
- module.exports = userModel;
+module.exports =  mongoose.model('places',placeSchema);
