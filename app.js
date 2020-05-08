@@ -9,7 +9,9 @@ var logger = require('morgan');
 const dbConfig = require('./config/database.config.js');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var apiRouter = require('./routes/api-routes');
+const jwt = require('./helpers/jwt');
+const errorHandler = require('./helpers/error-handler');
+// var apiRouter = require('./routes/api-routes');
 
 
 var app = express();
@@ -39,11 +41,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(jwt());
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 // app.use('/api',apiRouter);
 
 require('./routes/api-routes')(app);
+
+app.use(errorHandler);
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const config = require('../helpers/config.json');
+const jwt = require('jsonwebtoken');
 const userModel = require('../model/userModel');
-
+const bcrypt = require('bcrypt');
 
 // router.post('/authenticate', authenticate )
 // router.post('/register', register )
@@ -17,26 +19,20 @@ module.exports = {
     updateProfile
 };
 
-// async function authenticate(req, res, next) {
-//     await userModel.find({ emailId: req.body.emailId, password: req.body.password }, function (err, user) {
-//         if (err) {
-//             // return res.json({ message: "Email ID or Password is Incorrect" });
-//             res.json({ error: err });
-//         } else {
-//             // const { password, ...userWithoutPassword } = user;
-//             // res.json(...userWithoutPassword);
-//             res.json({ User: user });
-//         }
-//     });
-
-// }
-
 async function authenticate(req, res, next) {
-  const user = await userModel.findOne({ emailId: req.body.emailId, password: req.body.password }).select('-password');
-    if(!user) {
-        res.status(404).json({message: 'User Not Found'});
-    } else{
-        res.json({user});
+    const user = await userModel.findOne({ emailId: req.body.emailId });
+    if (!user) {
+        res.status(404).json({ message: 'User Not Found' });
+    } else {
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if (match) {
+            const token = jwt.sign({ sub: user.id, email: user.emailId }, config.secret);
+            // const { password, ...userWithoutPassword } = user;
+            // res.json(...userWithoutPassword);
+            res.json({ user, token });
+        } else {
+            res.json({ message: 'Password Incorrect' });
+        }
     }
 }
 
@@ -50,17 +46,18 @@ async function getUserData(req, res, next) {
     }).select('-password')
 }
 
-
 async function register(req, res, next) {
     console.log(req.body);
     let profileRes = new userModel(req.body);
-    // profileRes = req.body;
-    await profileRes.save(function (err, data) {
-        if (err) {
-            res.json({ error: err });
-        } else {
-            res.json({ message: 'User Registered Successfully', Profile: profileRes });
-        }
+    bcrypt.hash(req.body.password, 10).then(hash => {
+        profileRes.password = hash;
+        profileRes.save(function (err, data) {
+            if (err) {
+                res.json({ error: err });
+            } else {
+                res.json({ message: 'User Registered Successfully' });
+            }
+        });
     });
 }
 
